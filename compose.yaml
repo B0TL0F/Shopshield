@@ -1,0 +1,41 @@
+x-runtime: &runtime
+  read_only: true
+  user: "10001:10001"
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  tmpfs: [/tmp]
+  mem_limit: 128m
+  cpus: 0.5
+  restart: unless-stopped
+services:
+  gateway:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: gateway}}
+    ports: ["127.0.0.1:8080:8080"]
+  catalog:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: catalog}}
+  cart:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: cart}}
+  pricing:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: pricing}}
+  inventory:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: inventory}}
+  orders:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: orders}}
+  payments:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: payments}}
+  shipping:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: shipping}}
+  notifications:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: notifications}}
+  recommendations:
+    <<: *runtime
+    build: {context: ., args: {SERVICE: recommendations}}
