@@ -8,3 +8,5 @@ __pycache__/
 *.tfplan
 .env
 kubeconfig*
+*.md
+docs/
