@@ -1,5 +1,5 @@
 # Use Debian 13 rather than the Debian 12 base flagged in Trivy_logs.
-# CI still blocks HIGH/CRITICAL findings; refresh and rescan on each build.
+# Refresh and rescan on each build; CI scans are advisory during flow testing.
 FROM python:3.12.16-slim-trixie AS check
 ARG SERVICE
 WORKDIR /build
