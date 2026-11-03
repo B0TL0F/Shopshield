@@ -1,0 +1,172 @@
+name: Deploy dev
+
+# Run manually after CI succeeds. This workflow never builds new images.
+on:
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: Print safe OIDC claims for initial Azure trust setup only
+        type: boolean
+        default: false
+      ci_run_id:
+        description: Successful main push CI run ID (required unless bootstrap)
+        type: string
+      services:
+        description: all, or comma-separated names such as catalog,cart
+        type: string
+        default: all
+
+permissions:
+  contents: read
+
+# Serialize deployments so two manual runs cannot change dev simultaneously.
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    if: inputs.bootstrap && github.ref == 'refs/heads/main'
+    environment: dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      id-token: write
+    steps:
+      - name: Print issuer, audience and subject without printing the token
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, urllib.request
+          url = os.environ['ACTIONS_ID_TOKEN_REQUEST_URL'] + '&audience=api%3A%2F%2FAzureADTokenExchange'
+          request = urllib.request.Request(url, headers={
+              'Authorization': 'Bearer ' + os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
+          with urllib.request.urlopen(request, timeout=20) as response:
+              payload = json.load(response)['value'].split('.')[1]
+          claims = json.loads(base64.urlsafe_b64decode(payload + '=' * (-len(payload) % 4)))
+          print(json.dumps({key: claims[key] for key in ('iss', 'aud', 'sub')}))
+          PY
+
+  deploy:
+    if: ${{ !inputs.bootstrap && github.ref == 'refs/heads/main' }}
+    environment: dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - name: Verify chosen CI run belongs to this repository and succeeded
+        id: revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.ci_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" > "$RUNNER_TEMP/ci-run.json"
+          python3 - <<'PY'
+          import json, os, re
+          with open(os.path.join(os.environ['RUNNER_TEMP'], 'ci-run.json')) as source:
+              run = json.load(source)
+          if not (
+              run['conclusion'] == 'success' and run['status'] == 'completed'
+              and run['event'] == 'push' and run['head_branch'] == 'main'
+              and run['path'] == '.github/workflows/ci.yaml'
+              and run['head_repository']['full_name'] == os.environ['GITHUB_REPOSITORY']
+              and re.fullmatch('[0-9a-f]{40}', run['head_sha'])
+          ):
+              raise SystemExit('Choose a successful main push run of this repository CI workflow')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('sha=' + run['head_sha'] + '\n')
+          PY
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.revision.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install manifest tooling
+        run: python -m pip install PyYAML==6.0.3
+      - name: Render selected services with verified CI image tags
+        id: manifests
+        env:
+          IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/shopshield
+          REVISION: ${{ steps.revision.outputs.sha }}
+          SELECTED_SERVICES: ${{ inputs.services }}
+          OUTPUT_PATH: ${{ runner.temp }}/dev-workloads.yaml
+        run: python scripts/render-dev.py
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Read the target AKS Kubernetes version
+        id: cluster
+        env:
+          RG: ${{ vars.AKS_RESOURCE_GROUP }}
+          AKS: ${{ vars.AKS_NAME }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(az aks show --resource-group "$RG" --name "$AKS" --query kubernetesVersion -o tsv)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          echo "version=v$version" >> "$GITHUB_OUTPUT"
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: ${{ steps.cluster.outputs.version }}
+      - uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: v0.2.2
+      - name: Connect using the namespace-scoped deployment identity
+        env:
+          RG: ${{ vars.AKS_RESOURCE_GROUP }}
+          AKS: ${{ vars.AKS_NAME }}
+          KUBECONFIG: ${{ runner.temp }}/shopshield-kubeconfig
+        run: |
+          az aks get-credentials --resource-group "$RG" --name "$AKS" --overwrite-existing
+          kubelogin convert-kubeconfig -l azurecli
+      - name: Validate and apply policies and selected workloads
+        env:
+          KUBECONFIG: ${{ runner.temp }}/shopshield-kubeconfig
+        run: |
+          set -euo pipefail
+          # Namespace creation stays with the human cluster administrator.
+          kubectl apply --dry-run=server -f k8s/dev/policies/
+          kubectl apply --dry-run=server -f "$RUNNER_TEMP/dev-workloads.yaml"
+          kubectl apply -f k8s/dev/policies/
+          kubectl apply -f "$RUNNER_TEMP/dev-workloads.yaml"
+      - name: Wait for the selected services
+        env:
+          KUBECONFIG: ${{ runner.temp }}/shopshield-kubeconfig
+          SERVICES: ${{ steps.manifests.outputs.services }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          read -r -a selected <<< "$SERVICES"
+          for service in "${selected[@]}"; do
+            kubectl -n shopshield rollout status "deployment/$service" --timeout=300s
+          done
+          kubectl -n shopshield get deployments,services
+      - name: Check full deployment through the public load balancer
+        if: steps.manifests.outputs.full_deploy == 'true'
+        env:
+          KUBECONFIG: ${{ runner.temp }}/shopshield-kubeconfig
+        shell: bash
+        run: |
+          set -euo pipefail
+          gateway_ip=''
+          for attempt in {1..60}; do
+            gateway_ip=$(kubectl -n shopshield get service gateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            if [[ -n "$gateway_ip" ]]; then break; fi
+            sleep 5
+          done
+          [[ -n "$gateway_ip" ]] || { echo 'Gateway public IP was not assigned'; exit 1; }
+          export GATEWAY_URL="http://${gateway_ip}:8080"
+          python scripts/smoke-dev.py
+      - name: Report selected-service validation
+        if: steps.manifests.outputs.full_deploy != 'true'
+        run: echo 'Selected services are ready. Full checkout smoke testing runs only when all ten services are selected.'

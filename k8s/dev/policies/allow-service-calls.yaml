@@ -1,0 +1,647 @@
+# Allow gateway -> catalog on TCP 8080.
+# This half allows gateway to initiate a connection to catalog.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: gateway-to-catalog # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: gateway # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: catalog # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow gateway -> catalog on TCP 8080.
+# This half allows catalog to receive a connection from gateway.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: catalog-from-gateway # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: catalog # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: gateway # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow gateway -> cart on TCP 8080.
+# This half allows gateway to initiate a connection to cart.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: gateway-to-cart # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: gateway # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: cart # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow gateway -> cart on TCP 8080.
+# This half allows cart to receive a connection from gateway.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: cart-from-gateway # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: cart # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: gateway # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow gateway -> orders on TCP 8080.
+# This half allows gateway to initiate a connection to orders.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: gateway-to-orders # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: gateway # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: orders # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow gateway -> orders on TCP 8080.
+# This half allows orders to receive a connection from gateway.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: orders-from-gateway # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: orders # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: gateway # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow gateway -> recommendations on TCP 8080.
+# This half allows gateway to initiate a connection to recommendations.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: gateway-to-recommendations # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: gateway # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: recommendations # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow gateway -> recommendations on TCP 8080.
+# This half allows recommendations to receive a connection from gateway.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: recommendations-from-gateway # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: recommendations # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: gateway # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow pricing -> catalog on TCP 8080.
+# This half allows pricing to initiate a connection to catalog.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: pricing-to-catalog # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: pricing # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: catalog # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow pricing -> catalog on TCP 8080.
+# This half allows catalog to receive a connection from pricing.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: catalog-from-pricing # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: catalog # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: pricing # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> cart on TCP 8080.
+# This half allows orders to initiate a connection to cart.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: orders-to-cart # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: orders # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: cart # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> cart on TCP 8080.
+# This half allows cart to receive a connection from orders.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: cart-from-orders # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: cart # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: orders # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> inventory on TCP 8080.
+# This half allows orders to initiate a connection to inventory.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: orders-to-inventory # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: orders # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: inventory # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> inventory on TCP 8080.
+# This half allows inventory to receive a connection from orders.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: inventory-from-orders # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: inventory # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: orders # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> pricing on TCP 8080.
+# This half allows orders to initiate a connection to pricing.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: orders-to-pricing # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: orders # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: pricing # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> pricing on TCP 8080.
+# This half allows pricing to receive a connection from orders.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: pricing-from-orders # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: pricing # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: orders # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> payments on TCP 8080.
+# This half allows orders to initiate a connection to payments.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: orders-to-payments # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: orders # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: payments # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> payments on TCP 8080.
+# This half allows payments to receive a connection from orders.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: payments-from-orders # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: payments # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: orders # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> shipping on TCP 8080.
+# This half allows orders to initiate a connection to shipping.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: orders-to-shipping # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: orders # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: shipping # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> shipping on TCP 8080.
+# This half allows shipping to receive a connection from orders.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: shipping-from-orders # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: shipping # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: orders # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> notifications on TCP 8080.
+# This half allows orders to initiate a connection to notifications.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: orders-to-notifications # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: orders # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: notifications # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow orders -> notifications on TCP 8080.
+# This half allows notifications to receive a connection from orders.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: notifications-from-orders # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: notifications # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: orders # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow recommendations -> catalog on TCP 8080.
+# This half allows recommendations to initiate a connection to catalog.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: recommendations-to-catalog # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: recommendations # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Egress # Outgoing traffic from selected pods.
+  egress: # Allowed outgoing connections from the selected pods.
+  - to: # Allowed destinations for outgoing connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: catalog # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.
+--- # Start a separate Kubernetes resource.
+# Allow recommendations -> catalog on TCP 8080.
+# This half allows catalog to receive a connection from recommendations.
+# The matching policy on the other service permits the other half.
+# Replies to an allowed connection are permitted automatically.
+# These rules control pods/ports, not HTTP paths, passwords, or encryption.
+apiVersion: networking.k8s.io/v1 # Kubernetes API group/version that defines NetworkPolicy.
+kind: NetworkPolicy # This resource controls permitted pod network connections.
+metadata: # Identifying information for this policy.
+  name: catalog-from-recommendations # Unique policy name within this namespace.
+  namespace: shopshield # Create this policy in the application namespace.
+spec: # The traffic selection and permission rules.
+  podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+    matchLabels: # Every label listed here must match (logical AND).
+      app: catalog # Match this particular microservice.
+      project: shopshield # Match Shopshield application pods.
+  policyTypes: # Directions controlled for the selected application pods.
+  - Ingress # Incoming traffic to selected pods.
+  ingress: # Allowed incoming connections to the selected pods.
+  - from: # Allowed sources for incoming connections.
+    - podSelector: # Select pods by label; without a namespaceSelector, peers are in this policy namespace.
+        matchLabels: # Every label listed here must match (logical AND).
+          app: recommendations # Match this particular microservice.
+          project: shopshield # Match Shopshield application pods.
+    ports: # Restrict the allowed connection to these protocols and destination ports.
+    - protocol: TCP # Transport protocol for this permission.
+      port: 8080 # Application HTTP destination port.

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: shopshield
+  labels:
+    app: orders
+    project: shopshield
+    environment: dev
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+        project: shopshield
+        environment: dev
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: orders
+          image: ghcr.io/b0tl0f/shopshield-orders:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 25m
+              memory: 48Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10

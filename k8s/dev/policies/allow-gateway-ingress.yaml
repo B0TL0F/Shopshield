@@ -1,0 +1,21 @@
+# Public entry point: allow clients to reach gateway through its LoadBalancer.
+# This exception adds to default-deny; backend pods retain their restrictions.
+apiVersion: networking.k8s.io/v1 # API defining Kubernetes network policies.
+kind: NetworkPolicy # Control permitted connections to selected pods.
+metadata:
+  name: allow-gateway-ingress # Unique policy name in this namespace.
+  namespace: shopshield # Apply this policy in the application namespace.
+spec:
+  podSelector: # Only gateway pods receive this permission.
+    matchLabels: # Both labels must match.
+      app: gateway
+      project: shopshield
+  policyTypes:
+    - Ingress # Incoming connections only; outgoing rules remain unchanged.
+  ingress:
+    # No 'from' selector means allow any source, including external clients.
+    # This also allows internal callers to gateway on this port.
+    # Do not use an empty rule {}: that would permit every destination port.
+    - ports:
+        - protocol: TCP # Application HTTP transport.
+          port: 8080 # Gateway pod's HTTP port; other ports are not opened here.

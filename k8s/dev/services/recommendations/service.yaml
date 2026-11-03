@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendations
+  namespace: shopshield
+  labels:
+    app: recommendations
+    project: shopshield
+    environment: dev
+spec:
+  type: ClusterIP
+  selector:
+    app: recommendations
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

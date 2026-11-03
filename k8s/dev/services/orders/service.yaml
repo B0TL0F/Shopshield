@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders
+  namespace: shopshield
+  labels:
+    app: orders
+    project: shopshield
+    environment: dev
+spec:
+  type: ClusterIP
+  selector:
+    app: orders
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

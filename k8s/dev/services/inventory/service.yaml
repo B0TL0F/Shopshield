@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory
+  namespace: shopshield
+  labels:
+    app: inventory
+    project: shopshield
+    environment: dev
+spec:
+  type: ClusterIP
+  selector:
+    app: inventory
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

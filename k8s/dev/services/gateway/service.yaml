@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: shopshield
+  labels:
+    app: gateway
+    project: shopshield
+    environment: dev
+spec:
+  # AKS configures a public Azure Load Balancer endpoint for this Service.
+  type: LoadBalancer
+  # Allow external traffic to reach ready gateway pods across cluster nodes.
+  externalTrafficPolicy: Cluster
+  selector:
+    app: gateway
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

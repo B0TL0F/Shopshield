@@ -1,0 +1,13 @@
+imagePrefix: ghcr.io/b0tl0f/shopshield
+imageTag: local
+services:
+  gateway: {calls: [catalog, cart, orders, recommendations]}
+  catalog: {calls: []}
+  cart: {calls: []}
+  pricing: {calls: [catalog]}
+  inventory: {calls: []}
+  orders: {calls: [cart, inventory, pricing, payments, shipping, notifications]}
+  payments: {calls: []}
+  shipping: {calls: []}
+  notifications: {calls: []}
+  recommendations: {calls: [catalog]}

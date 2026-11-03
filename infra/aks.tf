@@ -17,7 +17,7 @@ resource "azurerm_kubernetes_cluster" "lab" {
   }
   default_node_pool {
     name            = "system"
-    node_count      = 2
+    node_count      = 1 # Central India lab quota constraint.
     vm_size         = var.vm_size
     vnet_subnet_id  = azurerm_subnet.aks.id
     max_pods        = 30
