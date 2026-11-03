@@ -112,8 +112,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version=$(az aks show --resource-group "$RG" --name "$AKS" --query kubernetesVersion -o tsv)
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          # kubernetesVersion may be a minor alias; use the running patch version.
+          version=$(az aks show --resource-group "$RG" --name "$AKS" --query currentKubernetesVersion -o tsv)
+          echo "AKS current Kubernetes version: $version"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::AKS did not return a full currentKubernetesVersion (major.minor.patch). Check the cluster provisioning state."
+            exit 1
+          fi
           echo "version=v$version" >> "$GITHUB_OUTPUT"
       - uses: azure/setup-kubectl@v4
         with:
