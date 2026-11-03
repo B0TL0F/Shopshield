@@ -24,9 +24,14 @@ def smoke():
         try:
             products = request('/products')
             break
-        except (URLError, HTTPError, TimeoutError):
+        except (URLError, HTTPError, TimeoutError) as error:
+            print(f'Gateway {base}/products attempt {attempt + 1}/20 failed: {error}', flush=True)
             if attempt == 19:
-                raise
+                raise RuntimeError(
+                    f'Public gateway {base} is unreachable or unhealthy after 20 attempts. '
+                    'Check gateway endpoints, load balancer health and the custom subnet NSG '
+                    '(public TCP 8080 must be allowed).'
+                ) from error
             time.sleep(3)
     if len(products['products']) != 3:
         raise RuntimeError('Expected three catalog products')

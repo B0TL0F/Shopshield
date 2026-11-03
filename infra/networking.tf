@@ -16,6 +16,20 @@ resource "azurerm_network_security_group" "nodes" {
   name                = "nsg-aks-nodes"
   location            = azurerm_resource_group.lab.location
   resource_group_name = azurerm_resource_group.lab.name
+
+  # AKS manages the node NIC NSG, but not this custom subnet NSG.
+  # Both must permit public traffic to the gateway LoadBalancer's port.
+  security_rule {
+    name                       = "Allow-ShopShield-Gateway"
+    priority                   = 1000
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8080"
+    source_address_prefix      = "Internet"
+    destination_address_prefix = "*"
+  }
 }
 
 resource "azurerm_subnet_network_security_group_association" "nodes" {
