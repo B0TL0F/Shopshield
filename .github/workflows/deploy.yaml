@@ -125,7 +125,7 @@ jobs:
           version: ${{ steps.cluster.outputs.version }}
       - uses: azure/use-kubelogin@v1
         with:
-          kubelogin-version: v0.2.2
+          kubelogin-version: v0.2.20
       - name: Connect using the namespace-scoped deployment identity
         env:
           RG: ${{ vars.AKS_RESOURCE_GROUP }}
