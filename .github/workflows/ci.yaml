@@ -87,7 +87,11 @@ jobs:
         env:
           SERVICE: ${{ matrix.service }}
         # Refresh the base image so available security updates are included.
-        run: docker build --pull --build-arg SERVICE="$SERVICE" -t "$IMAGE" .
+        run: |
+          docker build --pull --build-arg SERVICE="$SERVICE" \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            -t "$IMAGE" .
       - name: Scan image before publishing
         # Temporary flow testing: images may publish even when this scan fails.
         continue-on-error: true
