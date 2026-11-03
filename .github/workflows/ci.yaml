@@ -82,7 +82,8 @@ jobs:
       - name: Build this service image
         env:
           SERVICE: ${{ matrix.service }}
-        run: docker build --build-arg SERVICE="$SERVICE" -t "$IMAGE" .
+        # Refresh the base image so available security updates are included.
+        run: docker build --pull --build-arg SERVICE="$SERVICE" -t "$IMAGE" .
       - name: Scan image before publishing
         uses: aquasecurity/trivy-action@v0.36.0
         with:
